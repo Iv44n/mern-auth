@@ -32,7 +32,7 @@ export default [
       '@stylistic/no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0 }],
       '@stylistic/eol-last': 'error',
       'no-duplicate-imports': 'error',
-      'no-unused-vars': 'error',
+      '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'off'
     }
   },
