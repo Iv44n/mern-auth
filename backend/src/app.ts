@@ -8,6 +8,9 @@ import { APP_ORIGIN } from './constants/env'
 import requestLogger from './middlewares/requestLogger'
 import errorHandler from './middlewares/errorHandler'
 
+// IMPORT ROUTES
+import authRoutes from './routes/auth.routes'
+
 const app = express()
 
 // MIDDLEWARES
@@ -21,9 +24,7 @@ app.use(co())
 app.use(requestLogger)
 
 // ROUTES
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+app.use('/auth', authRoutes)
 
 // ERROR HANDLERS
 app.use(errorHandler)
