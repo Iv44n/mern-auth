@@ -7,10 +7,17 @@ import stylistic from '@stylistic/eslint-plugin'
 export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-
+  {
+    ignores: ['node_modules/**', 'dist/**']
+  },
   {
     files: ['**/*.{js,mjs,cjs,ts}'],
     languageOptions: { globals: globals.node },
+    ignores: ['node_modules/**', 'dist/**'],
+    plugins: {
+      '@stylistic/ts': stylisticTs,
+      '@stylistic': stylistic
+    },
     rules: {
       '@stylistic/ts/indent': ['error', 2],
       '@stylistic/ts/quotes': ['error', 'single'],
@@ -44,13 +51,6 @@ export default [
         }
       ],
       '@typescript-eslint/no-explicit-any': 'off'
-    }
-  },
-  {
-    ignores: ['node_modules/**', 'dist/**'],
-    plugins: {
-      '@stylistic/ts': stylisticTs,
-      '@stylistic': stylistic
     }
   }
 ]
