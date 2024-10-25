@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { thirtyDaysFromNow } from '../utils/date'
 
 export interface SessionDocument extends mongoose.Document {
   userId: mongoose.Types.ObjectId
@@ -22,7 +23,7 @@ const sessionSchema = new mongoose.Schema<SessionDocument>({
   expiresAt: {
     type: Date,
     required: true,
-    default: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    default: thirtyDaysFromNow
   }
 })
 
