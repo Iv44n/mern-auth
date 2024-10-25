@@ -11,9 +11,17 @@ export const registerHandler: RequestHandler = async (req, res, next): Promise<a
       userAgent: req.headers['user-agent']
     })
 
-    const data = await createAcount(request)
+    const { user, accessToken } = await createAcount(request)
 
-    return res.status(CREATED).json(data)
+    return res
+      .cookie('accessToken', accessToken, {
+        sameSite: 'strict',
+        httpOnly: true,
+        secure: false,
+        expires: new Date(Date.now() + 10 * 60 * 1000) // 10 min
+      })
+      .status(CREATED).json(user)
+
   } catch (error) {
     if(error instanceof AppError){
       return res.status(error.statusCode).json({ error: error.message })
