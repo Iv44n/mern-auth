@@ -3,7 +3,7 @@ import { CREATED } from '../constants/http'
 import { registerSchema } from '../schemas/auth.schema'
 import { createAcount } from '../services/auth.service'
 import AppError from '../utils/AppError'
-import { thirtyDaysFromNow } from '../utils/date'
+import { tenMinutesFromNow, thirtyDaysFromNow } from '../utils/date'
 
 export const registerHandler: RequestHandler = async (req, res, next): Promise<any> => {
   try {
@@ -19,7 +19,7 @@ export const registerHandler: RequestHandler = async (req, res, next): Promise<a
         sameSite: 'strict',
         httpOnly: true,
         secure: false,
-        expires: new Date(Date.now() + 10 * 60 * 1000) // 10 min
+        expires: tenMinutesFromNow()
       })
       .cookie('refreshToken', refreshToken, {
         sameSite: 'strict',
