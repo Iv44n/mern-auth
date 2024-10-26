@@ -1,5 +1,5 @@
 import Audience from '../constants/audience'
-import { JWT_SECRET } from '../constants/env'
+import { JWT_REFRESH_SECRET, JWT_SECRET } from '../constants/env'
 import { CONFLICT } from '../constants/http'
 import SessionModel from '../models/session.model'
 import UserModel from '../models/user.model'
@@ -36,6 +36,17 @@ export const createAcount = async (data: createAcountParams) => {
     userAgent: data.userAgent
   })
 
+  const refreshToken = jwt.sign(
+    {
+      sessionId: session._id
+    },
+    JWT_REFRESH_SECRET,
+    {
+      expiresIn: '30d',
+      audience: [Audience.User]
+    }
+  )
+
   const accessToken = jwt.sign(
     {
       userId,
@@ -50,6 +61,7 @@ export const createAcount = async (data: createAcountParams) => {
 
   return {
     user: user.omitPassword(),
+    refreshToken,
     accessToken
   }
 }
