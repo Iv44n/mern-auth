@@ -3,6 +3,7 @@ import { CREATED } from '../constants/http'
 import { registerSchema } from '../schemas/auth.schema'
 import { createAcount } from '../services/auth.service'
 import AppError from '../utils/AppError'
+import { thirtyDaysFromNow } from '../utils/date'
 
 export const registerHandler: RequestHandler = async (req, res, next): Promise<any> => {
   try {
@@ -11,7 +12,7 @@ export const registerHandler: RequestHandler = async (req, res, next): Promise<a
       userAgent: req.headers['user-agent']
     })
 
-    const { user, accessToken } = await createAcount(request)
+    const { user, accessToken, refreshToken } = await createAcount(request)
 
     return res
       .cookie('accessToken', accessToken, {
@@ -19,6 +20,13 @@ export const registerHandler: RequestHandler = async (req, res, next): Promise<a
         httpOnly: true,
         secure: false,
         expires: new Date(Date.now() + 10 * 60 * 1000) // 10 min
+      })
+      .cookie('refreshToken', refreshToken, {
+        sameSite: 'strict',
+        httpOnly: true,
+        secure: false,
+        expires: thirtyDaysFromNow(),
+        path: '/auth/refresh'
       })
       .status(CREATED).json(user)
 
