@@ -3,7 +3,7 @@ import { CREATED } from '../constants/http'
 import { loginSchema, registerSchema } from '../schemas/auth.schema'
 import { createAcount, loginUser } from '../services/auth.service'
 import AppError from '../utils/AppError'
-import { tenMinutesFromNow, thirtyDaysFromNow } from '../utils/date'
+import { setAuthCookies } from '../utils/cookies'
 
 export const registerHandler: RequestHandler = async (req, res, next): Promise<any> => {
   try {
@@ -14,20 +14,7 @@ export const registerHandler: RequestHandler = async (req, res, next): Promise<a
 
     const { user, accessToken, refreshToken } = await createAcount(request)
 
-    return res
-      .cookie('accessToken', accessToken, {
-        sameSite: 'strict',
-        httpOnly: true,
-        secure: false,
-        expires: tenMinutesFromNow()
-      })
-      .cookie('refreshToken', refreshToken, {
-        sameSite: 'strict',
-        httpOnly: true,
-        secure: false,
-        expires: thirtyDaysFromNow(),
-        path: '/auth/refresh'
-      })
+    return setAuthCookies({ res, accessToken, refreshToken })
       .status(CREATED).json(user)
 
   } catch (error) {
@@ -49,20 +36,7 @@ export const loginHandler: RequestHandler = async (req, res, next): Promise<any>
 
     const { user, accessToken, refreshToken } = await loginUser(request)
 
-    return res
-      .cookie('accessToken', accessToken, {
-        sameSite: 'strict',
-        httpOnly: true,
-        secure: false,
-        expires: tenMinutesFromNow()
-      })
-      .cookie('refreshToken', refreshToken, {
-        sameSite: 'strict',
-        httpOnly: true,
-        secure: false,
-        expires: thirtyDaysFromNow(),
-        path: '/auth/refresh'
-      })
+    return setAuthCookies({ res, accessToken, refreshToken })
       .status(CREATED).json(user)
 
   } catch (error) {
