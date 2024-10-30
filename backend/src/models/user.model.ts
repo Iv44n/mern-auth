@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import { compareValue, hashValue } from '../utils/bcrypt'
 
-interface UserDocument extends mongoose.Document {
+export interface UserDocument extends mongoose.Document {
   username: string
   email: string
   password: string
