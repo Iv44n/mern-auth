@@ -1,10 +1,9 @@
-import Audience from '../constants/audience'
 import { JWT_REFRESH_SECRET, JWT_SECRET } from '../constants/env'
 import { CONFLICT, UNAUTHORIZED } from '../constants/http'
 import SessionModel from '../models/session.model'
 import UserModel from '../models/user.model'
 import AppError from '../utils/AppError'
-import jwt from 'jsonwebtoken'
+import { signToken } from '../utils/jwt'
 
 interface createAcountParams {
   email: string,
@@ -36,28 +35,14 @@ export const createAcount = async (data: createAcountParams) => {
     userAgent: data.userAgent
   })
 
-  const refreshToken = jwt.sign(
-    {
-      sessionId: session._id
-    },
-    JWT_REFRESH_SECRET,
-    {
-      expiresIn: '30d',
-      audience: [Audience.User]
-    }
-  )
+  const refreshToken = signToken({
+    sessionId: session._id
+  }, { secret: JWT_REFRESH_SECRET, expiresIn: '30d' })
 
-  const accessToken = jwt.sign(
-    {
-      userId,
-      sessionId: session._id
-    },
-    JWT_SECRET,
-    {
-      expiresIn: '10m',
-      audience: [Audience.User]
-    }
-  )
+  const accessToken = signToken({
+    userId,
+    sessionId: session._id
+  }, { secret: JWT_SECRET, expiresIn: '10m' })
 
   return {
     user: user.omitPassword(),
@@ -94,28 +79,14 @@ export const loginUser = async (data: loginParams) => {
     userAgent
   })
 
-  const refreshToken = jwt.sign(
-    {
-      sessionId: session._id
-    },
-    JWT_REFRESH_SECRET,
-    {
-      expiresIn: '30d',
-      audience: [Audience.User]
-    }
-  )
+  const refreshToken = signToken({
+    sessionId: session._id
+  }, { secret: JWT_REFRESH_SECRET, expiresIn: '30d' })
 
-  const accessToken = jwt.sign(
-    {
-      userId,
-      sessionId: session._id
-    },
-    JWT_SECRET,
-    {
-      expiresIn: '10m',
-      audience: [Audience.User]
-    }
-  )
+  const accessToken = signToken({
+    userId,
+    sessionId: session._id
+  }, { secret: JWT_SECRET, expiresIn: '10m' })
 
   return {
     user: user.omitPassword(),
