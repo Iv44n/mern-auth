@@ -3,7 +3,8 @@ import { CONFLICT, UNAUTHORIZED } from '../constants/http'
 import SessionModel from '../models/session.model'
 import UserModel from '../models/user.model'
 import AppError from '../utils/AppError'
-import { signToken } from '../utils/jwt'
+import { ONE_DAY_MS, thirtyDaysFromNow } from '../utils/date'
+import { RefreshTokenPayload, signToken, verifyToken } from '../utils/jwt'
 
 interface createAcountParams {
   email: string,
@@ -92,5 +93,42 @@ export const loginUser = async (data: loginParams) => {
     user: user.omitPassword(),
     refreshToken,
     accessToken
+  }
+}
+
+export const refreshUserAccessToken = async (refreshToken: string) => {
+  const { payload } = verifyToken<RefreshTokenPayload>(refreshToken, {
+    secret: JWT_REFRESH_SECRET
+  })
+
+  if (!payload) {
+    throw new AppError(UNAUTHORIZED, 'Invalid refresh token')
+  }
+
+  const session = await SessionModel.findById(payload.sessionId)
+
+  if (!(session && session.expiresAt.getTime() > Date.now())) {
+    throw new AppError(UNAUTHORIZED, 'Session expired')
+  }
+
+  const sessionNeedRefresh = session.expiresAt.getTime() - Date.now() <= ONE_DAY_MS
+
+  if (sessionNeedRefresh) {
+    session.expiresAt = thirtyDaysFromNow()
+    await session.save()
+  }
+
+  const newRefreshToken = sessionNeedRefresh
+    ? signToken({ sessionId: session._id }, { secret: JWT_REFRESH_SECRET, expiresIn: '30d' })
+    : undefined
+
+  const accessToken = signToken({
+    userId: session.userId,
+    sessionId: session._id
+  }, { secret: JWT_SECRET, expiresIn: '10m' })
+
+  return {
+    accessToken,
+    newRefreshToken
   }
 }
