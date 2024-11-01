@@ -3,14 +3,16 @@ import { SessionDocument } from '../models/session.model'
 import { UserDocument } from '../models/user.model'
 import Audience from '../constants/audience'
 
-type AccessTokenPayload = {
+export type AccessTokenPayload = {
   userId: UserDocument['_id']
   sessionId: SessionDocument['_id']
 }
 
-type TokenPayload = AccessTokenPayload | {
+export type RefreshTokenPayload = {
   sessionId: SessionDocument['_id']
 }
+
+type TokenPayload = AccessTokenPayload | RefreshTokenPayload
 
 type SignOptionsAndSecret = SignOptions & {
   secret: string
