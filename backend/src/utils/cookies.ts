@@ -11,12 +11,12 @@ const defaultsTokenCookieOptions: CookieOptions = {
   secure
 }
 
-const accessTokenCookieOptions: CookieOptions = {
+export const accessTokenCookieOptions: CookieOptions = {
   ...defaultsTokenCookieOptions,
   expires: tenMinutesFromNow()
 }
 
-const refreshTokenCookieOptions: CookieOptions = {
+export const refreshTokenCookieOptions: CookieOptions = {
   ...defaultsTokenCookieOptions,
   expires: thirtyDaysFromNow(),
   path: REFRESH_PATH
