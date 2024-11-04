@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { CREATED, OK, UNAUTHORIZED } from '../constants/http'
 import { loginSchema, registerSchema } from '../schemas/auth.schema'
 import { createAcount, loginUser, refreshUserAccessToken } from '../services/auth.service'
-import { accessTokenCookieOptions, refreshTokenCookieOptions, setAuthCookies } from '../utils/cookies'
+import { accessTokenCookieOptions, clearAuthCookies, refreshTokenCookieOptions, setAuthCookies } from '../utils/cookies'
 import catchErrors from '../utils/catchErrors'
 import { verifyToken } from '../utils/jwt'
 import { JWT_SECRET } from '../constants/env'
@@ -41,7 +41,7 @@ export const logoutHandler = catchErrors(async (req, res) => {
     await SessionModel.findByIdAndDelete(payload.sessionId)
   }
 
-  return res.clearCookie('accessToken').clearCookie('refreshToken', { path: '/auth/refresh' }).status(OK).json({
+  return clearAuthCookies({ res }).status(OK).json({
     message: 'Logout successful'
   })
 })
