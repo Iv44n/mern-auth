@@ -2,6 +2,7 @@ import { ErrorRequestHandler, Response } from 'express'
 import { INTERNAL_SERVER_ERROR, UNPROCESSABLE_CONTENT } from '../constants/http'
 import { z } from 'zod'
 import AppError from '../utils/AppError'
+import { clearAuthCookies, REFRESH_PATH } from '../utils/cookies'
 
 const zodErrorHandler = (err: z.ZodError, res: Response) => {
   const errors = err.issues.map((issue) => ({
@@ -15,7 +16,11 @@ const zodErrorHandler = (err: z.ZodError, res: Response) => {
   })
 }
 
-export const errorHandler: ErrorRequestHandler = (err, _req, res, _next): any => {
+export const errorHandler: ErrorRequestHandler = (err, req, res, _next): any => {
+  if (req.path === REFRESH_PATH) {
+    clearAuthCookies({ res })
+  }
+
   if (err instanceof z.ZodError){
     return zodErrorHandler(err, res)
   }
