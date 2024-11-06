@@ -1,9 +1,11 @@
-import { JWT_REFRESH_SECRET, JWT_SECRET } from '../constants/env'
-import { CONFLICT, UNAUTHORIZED } from '../constants/http'
+import { APP_ORIGIN, JWT_REFRESH_SECRET, JWT_SECRET } from '../constants/env'
+import { CONFLICT, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED } from '../constants/http'
+import VerificationCodeType from '../constants/verificationCodeType'
 import SessionModel from '../models/session.model'
 import UserModel from '../models/user.model'
+import verificationCodeModel from '../models/verificationCode.model'
 import AppError from '../utils/AppError'
-import { ONE_DAY_MS, thirtyDaysFromNow } from '../utils/date'
+import { ONE_DAY_MS, oneYearFromNow, thirtyDaysFromNow } from '../utils/date'
 import { RefreshTokenPayload, signToken, verifyToken } from '../utils/jwt'
 
 interface createAcountParams {
@@ -30,6 +32,14 @@ export const createAcount = async (data: createAcountParams) => {
   })
 
   const userId = user._id
+
+  const verificationCode = await verificationCodeModel.create({
+    userId,
+    type: VerificationCodeType.EmailVerification,
+    expiresAt: oneYearFromNow()
+  })
+
+  const url = `${APP_ORIGIN}/auth/email/verify/${verificationCode._id}}`
 
   const session = await SessionModel.create({
     userId,
@@ -130,5 +140,31 @@ export const refreshUserAccessToken = async (refreshToken: string) => {
   return {
     accessToken,
     newRefreshToken
+  }
+}
+
+export const verifyEmail = async (code: string) => {
+  const validCode = await verificationCodeModel.findOne({
+    _id: code,
+    type: VerificationCodeType.EmailVerification,
+    expiresAt: { $gt: new Date() }
+  })
+
+  if (!validCode) {
+    throw new AppError(NOT_FOUND, 'Invalid or expired verification code')
+  }
+
+  const updateUser = await UserModel.findOneAndUpdate(validCode.userId, {
+    verified: true
+  }, { new: true })
+
+  if (!updateUser) {
+    throw new AppError(INTERNAL_SERVER_ERROR, 'Failed to verify email')
+  }
+
+  await validCode.deleteOne()
+
+  return {
+    user: updateUser.omitPassword()
   }
 }
