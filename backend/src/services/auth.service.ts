@@ -6,7 +6,9 @@ import UserModel from '../models/user.model'
 import verificationCodeModel from '../models/verificationCode.model'
 import AppError from '../utils/AppError'
 import { ONE_DAY_MS, oneYearFromNow, thirtyDaysFromNow } from '../utils/date'
+import { getVerifyEmailTemplate } from '../utils/emailTemplates'
 import { RefreshTokenPayload, signToken, verifyToken } from '../utils/jwt'
+import { sendEmail } from '../utils/sendEmail'
 
 interface createAcountParams {
   email: string,
@@ -39,7 +41,16 @@ export const createAcount = async (data: createAcountParams) => {
     expiresAt: oneYearFromNow()
   })
 
-  const url = `${APP_ORIGIN}/auth/email/verify/${verificationCode._id}}`
+  const url = `${APP_ORIGIN}/auth/email/verify/${verificationCode._id}`
+
+  const { error } = await sendEmail({
+    to: user.email,
+    ...getVerifyEmailTemplate(url)
+  })
+
+  if (error) {
+    throw new AppError(INTERNAL_SERVER_ERROR, 'Error sending verification email')
+  }
 
   const session = await SessionModel.create({
     userId,
