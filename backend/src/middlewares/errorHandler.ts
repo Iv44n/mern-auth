@@ -16,20 +16,22 @@ const zodErrorHandler = (err: z.ZodError, res: Response) => {
   })
 }
 
-export const errorHandler: ErrorRequestHandler = (err, req, res, _next): any => {
+export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   if (req.path === REFRESH_PATH) {
     clearAuthCookies({ res })
   }
 
   if (err instanceof z.ZodError){
-    return zodErrorHandler(err, res)
+    zodErrorHandler(err, res)
+    return
   }
 
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({ error: err.message })
+    res.status(err.statusCode).json({ error: err.message })
+    return
   }
 
-  return res.status(INTERNAL_SERVER_ERROR).send('Internal Server Error')
+  res.status(INTERNAL_SERVER_ERROR).send('Internal Server Error')
 }
 
 export default errorHandler
