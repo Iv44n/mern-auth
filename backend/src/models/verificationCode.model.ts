@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import VerificationCodeType from '../constants/verificationCodeType'
 
 export interface VerificationCodeDocument extends mongoose.Document {
+  _id: mongoose.Types.ObjectId
   userId: mongoose.Types.ObjectId
   type: VerificationCodeType
   expiresAt: Date

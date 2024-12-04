@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import { thirtyDaysFromNow } from '../utils/date'
 
 export interface SessionDocument extends mongoose.Document {
+  _id: mongoose.Types.ObjectId
   userId: mongoose.Types.ObjectId
   userAgent?: string
   createdAt: Date
