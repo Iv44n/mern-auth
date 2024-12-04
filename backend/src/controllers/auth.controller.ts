@@ -27,10 +27,11 @@ export const loginHandler: RequestHandler = catchErrors(async (req, res) => {
     userAgent: req.headers['user-agent']
   })
 
-  const { user, accessToken, refreshToken } = await loginUser(request)
+  const { accessToken, refreshToken } = await loginUser(request)
 
   return setAuthCookies({ res, accessToken, refreshToken })
-    .status(CREATED).json(user)
+    .status(OK)
+    .json({ message: 'Login successful' })
 })
 
 export const logoutHandler = catchErrors(async (req, res) => {
