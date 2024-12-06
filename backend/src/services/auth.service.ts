@@ -1,4 +1,4 @@
-import { APP_ORIGIN, JWT_REFRESH_SECRET, JWT_SECRET } from '../constants/env'
+import { JWT_REFRESH_SECRET, JWT_SECRET, THIS_APP_ORIGIN } from '../constants/env'
 import { CONFLICT, INTERNAL_SERVER_ERROR, NOT_FOUND, UNAUTHORIZED } from '../constants/http'
 import VerificationCodeType from '../constants/verificationCodeType'
 import SessionModel from '../models/session.model'
@@ -40,7 +40,7 @@ export const createAcount = async (data: createAcountParams) => {
     expiresAt: oneYearFromNow()
   })
 
-  const url = `${APP_ORIGIN}/auth/email/verify/${verificationCode._id}`
+  const url = `${THIS_APP_ORIGIN}/auth/email/verify/${verificationCode._id}`
 
   const { error } = await sendEmail({
     to: user.email,
