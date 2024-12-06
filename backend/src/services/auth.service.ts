@@ -19,8 +19,7 @@ interface createAcountParams {
 
 export const createAcount = async (data: createAcountParams) => {
   const existingUser = await UserModel.exists({
-    username: data.username,
-    email: data.email
+    $or: [{ username: data.username }, { email: data.email }]
   })
 
   if(existingUser) {
