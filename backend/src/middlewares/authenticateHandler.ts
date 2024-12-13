@@ -4,21 +4,18 @@ import { UNAUTHORIZED } from '../constants/http'
 import { verifyToken } from '../utils/jwt'
 import { JWT_SECRET } from '../constants/env'
 
-const autenticateHandler: RequestHandler = (req, res, next) => {
+const authenticateHandler: RequestHandler = (req, res, next) => {
   const accessToken = req.cookies.accessToken as string | undefined
 
   if (!accessToken) {
-    throw new AppError(UNAUTHORIZED, 'Missing access token', 'InvalidAccessToken')
+    return next(new AppError(UNAUTHORIZED, 'Missing access token', 'InvalidAccessToken'))
   }
 
   const { payload, error } = verifyToken(accessToken, { secret: JWT_SECRET })
 
   if (error) {
-    throw new AppError(
-      UNAUTHORIZED,
-      error === 'jwt expired' ? 'Token expired' : 'Invalid token',
-      'InvalidAccessToken'
-    )
+    const errorMessage = error === 'jwt expired' ? 'Token expired' : 'Invalid token'
+    return next(new AppError(UNAUTHORIZED, errorMessage, 'InvalidAccessToken'))
   }
 
   req.userId = payload?.userId
@@ -27,4 +24,4 @@ const autenticateHandler: RequestHandler = (req, res, next) => {
   next()
 }
 
-export default autenticateHandler
+export default authenticateHandler
