@@ -5,35 +5,37 @@ import { NODE_ENV } from '../constants/env'
 export const REFRESH_PATH = '/auth/refresh'
 const secure = NODE_ENV !== 'development'
 
-const defaultsTokenCookieOptions: CookieOptions = {
+const defaultCookieOptions: CookieOptions = {
   sameSite: 'strict',
   httpOnly: true,
   secure
 }
 
 export const accessTokenCookieOptions: CookieOptions = {
-  ...defaultsTokenCookieOptions,
+  ...defaultCookieOptions,
   expires: tenMinutesFromNow()
 }
 
 export const refreshTokenCookieOptions: CookieOptions = {
-  ...defaultsTokenCookieOptions,
+  ...defaultCookieOptions,
   expires: thirtyDaysFromNow(),
   path: REFRESH_PATH
 }
 
-interface Params {
+interface AuthCookiesParams {
   res: Response
   accessToken: string
   refreshToken: string
 }
 
-export const setAuthCookies = ({ res, accessToken, refreshToken }: Params) =>
-  res
+export const setAuthCookies = ({ res, accessToken, refreshToken }: AuthCookiesParams): Response => {
+  return res
     .cookie('accessToken', accessToken, accessTokenCookieOptions)
     .cookie('refreshToken', refreshToken, refreshTokenCookieOptions)
+}
 
-export const clearAuthCookies = ({ res }: { res: Response }) =>
-  res
+export const clearAuthCookies = ({ res }: { res: Response }): Response => {
+  return res
     .clearCookie('accessToken')
     .clearCookie('refreshToken', { path: REFRESH_PATH })
+}
