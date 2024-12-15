@@ -11,7 +11,7 @@ const API = axios.create(options)
 const TokenRefreshClient = axios.create(options)
 
 API.interceptors.response.use(
-  (response) => response,
+  (response) => response.data,
   async (error) => {
     const { config: originalRequest, response } = error
     const { status, data } = response || {}
