@@ -40,11 +40,17 @@ const UserMenu = ({ username }: UserMenuProps) => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className='w-56 bg-zinc-900 text-zinc-100' align='start' sideOffset={5}>
-        <DropdownMenuItem className='hover:bg-zinc-800 focus:bg-zinc-800 focus:text-zinc-100'>
+        <DropdownMenuItem
+          onClick={() => navigate('/')}
+          className='hover:bg-zinc-800 focus:bg-zinc-800 focus:text-zinc-100'
+        >
           <User className='mr-2 h-4 w-4' />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem className='hover:bg-zinc-800 focus:bg-zinc-800 focus:text-zinc-100'>
+        <DropdownMenuItem
+          onClick={() => navigate('/settings')}
+          className='hover:bg-zinc-800 focus:bg-zinc-800 focus:text-zinc-100'
+        >
           <Settings className='mr-2 h-4 w-4' />
           <span>Settings</span>
         </DropdownMenuItem>
